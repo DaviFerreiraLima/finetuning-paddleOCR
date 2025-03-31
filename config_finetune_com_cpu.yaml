@@ -77,9 +77,9 @@ Train:
     ratio_list: [1.0]
   loader:
     shuffle: true
-    batch_size_per_card: 16
+    batch_size_per_card: 64
     drop_last: true
-    num_workers: 2
+    num_workers: 8
 
 Eval:
   dataset:
@@ -98,6 +98,6 @@ Eval:
     ratio_list: [1.0]
   loader:
     shuffle: false
-    batch_size_per_card: 16
+    batch_size_per_card: 64
     drop_last: false
-    num_workers: 2
+    num_workers: 8
