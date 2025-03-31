@@ -126,6 +126,12 @@ print(f"Devices: {paddle.device.get_device()}")
 
 ---
 
+### Setup adicional do ambiente e preparação dos dados
+
+```python
+python setup_dados_paddle_ocr.py
+```
+
 ## 📊 Treinamento  
 
 ### 🔹 Configuração (`config_finetune.yaml`)  
@@ -183,8 +189,6 @@ python test.py \
     --use_gpu False  # Mude para True se usando GPU
 ```
 
----
-
 ## ❌ Solução de Problemas  
 
 | Erro/Sintoma       | Causa Provável            | Solução                          |  
@@ -201,6 +205,4 @@ python test.py \
 ✔ O modelo pode ser integrado via **Python, C++ ou API REST**.  
 
 ```
-
----
 
