@@ -39,11 +39,28 @@ O modelo final pode ser integrado em:
 
 ## Pré-requisitos Técnicos
 
-### Download do Modelo Base
+### 1 Download do Modelo Base
 Antes de iniciar, baixe o modelo pré-treinado:
 
 ```bash
 wget https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_rec_train.tar -P dataset/
+```
+
+### 2. Preparação das Imagens
+- Todas as imagens devem estar na pasta `dataset/filter_images/`
+
+### 3. Verificação do labels.json
+O arquivo deve conter um array de objetos no formato:
+```json
+[
+  {
+    "text": "ABC1D23",
+    "image_path": "filter_images/placa_001.jpg"
+  },
+  {
+    "text": "XYZ9W87", 
+    "image_path": "filter_images/placa_002.jpg"
+  }
 ```
 ---
 
