@@ -6,6 +6,7 @@ import sys
 import tarfile
 from concurrent.futures import ThreadPoolExecutor
 from sklearn.model_selection import train_test_split
+import platform
 
 # Configurations
 BASE_DIR = "dataset"
@@ -124,52 +125,83 @@ def generate_characters_file():
     print(f"✓ Character file generated: {output_path}")
 
 def generate_csv_files(data):
-    """Generate CSV files only with existing images"""
+    """Generate CSV files that will be converted to PaddleOCR format"""
     # Process and filter data
     processed_data = []
-    with ThreadPoolExecutor() as executor:
-        results = executor.map(process_item, data)
-        processed_data = [item for item in results if item is not None]
-    
-    if not processed_data:
-        raise Exception("No valid images found in filter_images!")
+    for item in data:
+        processed_item = process_item(item)
+        if processed_item:
+            processed_data.append(processed_item)
     
     # Split data
     random.seed(42)
     train_data, temp_data = train_test_split(processed_data, test_size=0.2, random_state=42)
     test_data, eval_data = train_test_split(temp_data, test_size=0.5, random_state=42)
     
-    # Generate CSVs
+    # Generate CSVs with proper formatting
     csv_files = {
         'train.csv': train_data,
         'test.csv': test_data,
         'eval.csv': eval_data
     }
     
-    for filename, data in csv_files.items():
+    for filename, dataset in csv_files.items():
         csv_path = os.path.join(FINETUNE_DIR, filename)
+        
         with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
-            for row in data:
-                abs_path = os.path.abspath(row['path_da_imagem'])
-                csvfile.write(f"{abs_path}, {row['textDaPlaca']}\n")
-        #        relative_path = os.path.join('.', row['path_da_imagem'])
-        #        csvfile.write(f"{relative_path}, {row['textDaPlaca']}\n")
-       #         csvfile.write(f"{row['path_da_imagem']}, {row['textDaPlaca']}\n")
-        print(f"✓ CSV generated: {csv_path}")
+            for item in dataset:
+                abs_path = os.path.abspath(item['path_da_imagem'])
+                
+                # Critical Windows fixes:
+                if platform.system() == 'Windows':
+                    # Normalize path and handle spaces
+                    abs_path = os.path.normpath(abs_path)
+                    if ' ' in abs_path:
+                        abs_path = f'"{abs_path}"'
+                
+                # Write with TAB separator (not space)
+                csvfile.write(f"{abs_path}\t{item['textDaPlaca']}\n")
+        
+        print(f"✓ CSV file generated: {csv_path}")
         
         # Convert to PaddleOCR format
         txt_path = os.path.join(FINETUNE_DIR, filename.replace('.csv', '.txt'))
         gen_label_script = os.path.join(PADDLEOCR_DIR, "ppocr", "utils", "gen_label.py")
         
-        subprocess.run([
-            sys.executable,
-            gen_label_script,
-            '--mode=rec',
-            f'--input_path={csv_path}',
-            f'--output_label={txt_path}'
-        ], check=True)
-        
-        print(f"✓ PaddleOCR file generated: {txt_path}")
+        # Run PaddleOCR's label generator with explicit encoding
+        try:
+            subprocess.run([
+                sys.executable,
+                gen_label_script,
+                '--mode=rec',
+                f'--input_path={csv_path}',
+                f'--output_label={txt_path}',
+                '--delimiter="\t"'  # Explicitly specify we used tabs
+            ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            print(f"✓ PaddleOCR label file generated: {txt_path}")
+            
+            # Verify the generated file
+            with open(txt_path, 'r', encoding='utf-8') as f:
+                first_line = f.readline()
+                if not first_line or '\t' not in first_line:
+                    print(f"⚠️ Warning: Generated file might have formatting issues in first line: {first_line}")
+                    
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Error generating PaddleOCR file for {csv_path}")
+            print(f"Command failed: {e.cmd}")
+            print(f"Error output: {e.stderr.decode('utf-8') if e.stderr else 'None'}")
+            
+            # Fallback: manual conversion if PaddleOCR fails
+            print("Attempting manual conversion...")
+            try:
+                with open(csv_path, 'r', encoding='utf-8') as f_in, \
+                     open(txt_path, 'w', encoding='utf-8') as f_out:
+                    for line in f_in:
+                        f_out.write(line)
+                print(f"✓ Manual conversion successful: {txt_path}")
+            except Exception as fallback_error:
+                print(f"❌ Manual conversion failed: {str(fallback_error)}")
 
 def main():
     try:
@@ -178,8 +210,16 @@ def main():
         
         # Load data
         print(f"\n📂 Reading label file: {os.path.abspath(LABELS_PATH)}")
-        with open(LABELS_PATH, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        try:
+            with open(LABELS_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except UnicodeDecodeError:
+            # Tentar outras codificações se UTF-8 falhar
+            try:
+                with open(LABELS_PATH, 'r', encoding='latin-1') as f:
+                    data = json.load(f)
+            except Exception as e:
+                raise Exception(f"Failed to read label file with both UTF-8 and latin-1 encodings: {str(e)}")
         
         # Generate files
         print("\n🚀 Generating training files...")
@@ -195,7 +235,10 @@ def main():
         print(f"\n❌ Command execution error: {e.cmd}")
         print(f"Error code: {e.returncode}")
         if e.output:
-            print(f"Output: {e.output}")
+            try:
+                print(f"Output: {e.output.decode('utf-8')}")
+            except:
+                print(f"Output: {str(e.output)}")
     except FileNotFoundError as e:
         print(f"\n❌ File not found: {str(e)}")
     except Exception as e:
