@@ -42,10 +42,14 @@ O modelo final pode ser integrado em:
 ### 1 Download do Modelo Base
 Antes de iniciar, baixe o modelo pré-treinado:
 
+#### Mac ou linux
 ```bash
 wget https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_rec_train.tar -P dataset/
 ```
-
+#### Windows
+```bash
+Invoke-WebRequest -Uri "https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_rec_train.tar" -OutFile "dataset\en_PP-OCRv3_rec_train.tar"
+```
 ### 2. Preparação das Imagens
 - Todas as imagens devem estar na pasta `dataset/filter_images/`
 
