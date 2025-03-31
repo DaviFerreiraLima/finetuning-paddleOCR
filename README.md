@@ -135,14 +135,6 @@ pip install paddlepaddle-gpu==2.6.1 -f https://www.paddlepaddle.org.cn/whl/linux
 pip install paddlepaddle==2.6.1
 ```
 
-### 🧪 Testando a Instalação  
-```python
-import paddle
-print(f"PaddlePaddle Version: {paddle.__version__}")
-print(f"GPU Available: {paddle.is_compiled_with_cuda()}")
-print(f"Devices: {paddle.device.get_device()}")
-```
-
 ---
 
 ### Setup adicional do ambiente e preparação dos dados
@@ -174,16 +166,6 @@ python PaddleOCR/tools/train.py -c config_finetune_com_gpu.yaml
 ```bash
 python PaddleOCR/tools/train.py -c config_finetune.yaml
 ```
-
----
-
-## 📈 Avaliação  
-
-| Métrica             | Valor Esperado | Observação                    |  
-|---------------------|---------------|--------------------------------|  
-| Accuracy (acc)     | >85%           | Taxa de acerto por caractere  |  
-| Norm Edit Distance | >0.90          | Similaridade geral das placas |  
-| Loss              | <1.0            | Deve diminuir consistentemente |  
 
 ---
 
