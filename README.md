@@ -1,9 +1,6 @@
-Aqui está o README formatado em Markdown, incluindo emojis para destacar seções importantes e melhorar a legibilidade.  
 
----
 
-```markdown
-# 🚀 Fine-Tuning do PaddleOCR para Reconhecimento de Placas Veiculares BR  
+# Fine-Tuning do PaddleOCR para Reconhecimento de Placas Veiculares BR  
 
 ## 📋 Visão Geral  
 
