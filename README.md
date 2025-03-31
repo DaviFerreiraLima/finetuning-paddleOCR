@@ -37,12 +37,14 @@ O modelo final pode ser integrado em:
 
 ---
 
-## 🎯 Resultado Esperado  
+## Pré-requisitos Técnicos
 
-✅ Maior precisão que soluções genéricas  
-✅ Baixa latência em CPUs e GPUs  
-✅ Fácil integração em sistemas Python  
+### Download do Modelo Base
+Antes de iniciar, baixe o modelo pré-treinado:
 
+```bash
+wget https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_rec_train.tar -P dataset/
+```
 ---
 
 ## 📌 Estrutura do Projeto  
