@@ -1,0 +1,7 @@
+name: paddle_ocr  # Nome do ambiente
+channels:
+  - conda-forge  # Canal mais estável para pacotes científicos
+  - defaults
+dependencies:
+  - python=3.8  # Versão compatível com PaddleOCR
+  - scikit-learn>=1.0.0  # Para train_test_split
