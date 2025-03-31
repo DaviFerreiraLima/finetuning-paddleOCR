@@ -50,7 +50,7 @@ def setup_environment():
     else:
         print("⏳ Installing PaddlePaddle 2.6.1 via Conda for Linux...")
         subprocess.run([
-            "conda", "install", "paddlepaddle==2.6.1",
+            "conda", "install", "paddlepaddle==2.6.1", "cudatoolkit=11.7",
             "--channel", "https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/",
             "-y"
         ], check=True)
